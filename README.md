@@ -24,9 +24,6 @@ The module includes:
   - head–hand relationship measures (compensation proxy),
   - left vs. right comparative reporting.
 
-
-## Repository structure
-
 ## Repository structure
 
 ```text
@@ -43,6 +40,7 @@ RehabImmersive-Kinematic-Analysis/
 │   └── hbt_v_2_2.apk
 ├── LICENSE
 └── README.md
+```
 
 ## Running the VR applications (Meta Quest)
 
