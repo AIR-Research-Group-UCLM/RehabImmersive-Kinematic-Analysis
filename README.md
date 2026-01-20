@@ -97,17 +97,9 @@ If you use this repository in academic work, please cite:
 1. The SoftwareX paper describing this kinematic module/pipeline (to be added once published).
 2. The Rehab-Immersive framework paper:
 
-### BibTeX
-```bibtex
-@article{Herrera2023,
-  title = {Rehab-Immersive: A framework to support the development of virtual reality applications in upper limb rehabilitation},
-  author = {Herrera, Vanesa and Vallejo, David and Castro-Schez, Jose J. and Monekosso, Dorothy N. and de los Reyes, Ana and Glez-Morcillo, Carlos and Albusac, Javier},
-  journal = {SoftwareX},
-  volume = {23},
-  pages = {101412},
-  year = {2023},
-  doi = {10.1016/j.softx.2023.101412}
-}
+**Reference (framework paper):**  
+Herrera, V., Vallejo, D., Castro-Schez, J. J., Monekosso, D. N., de los Reyes, A., Glez-Morcillo, C., and Albusac, J. (2023). *Rehab-Immersive: A framework to support the development of virtual reality applications in upper limb rehabilitation*. **SoftwareX**, 23, 101412. https://doi.org/10.1016/j.softx.2023.101412
+
 
 ## License
 
