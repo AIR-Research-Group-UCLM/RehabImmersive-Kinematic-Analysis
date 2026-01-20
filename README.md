@@ -1,53 +1,126 @@
 # RehabImmersive-Kinematic-Analysis
 
-**A unified software ecosystem for upper-limb neurorehabilitation.**
-Combines VR serious games (Meta Quest) for motion capture with a privacy-focused web tool for kinematic analysis.
+A lightweight, local-first kinematic acquisition and analysis module within the broader **Rehab-Immersive** platform.  
+It provides **controller-free VR serious games** (Meta Quest) to log **6DoF head and hand kinematics**, plus a **standalone browser-based tool** to compute and visualize kinematic indicators for **unimanual** and **bimanual** upper-limb exercises.
+
+## Description
+
+This repository accompanies the SoftwareX manuscript describing a unified workflow that connects immersive VR-based occupational therapy tasks with objective kinematic assessment. The workflow is designed to be practical in real settings by avoiding external motion-capture infrastructures, minimizing operational complexity, and keeping processing local by default.
+
+The module includes:
+1. **VR acquisition (Meta Quest APKs)** implementing two serious-game tasks and local telemetry logging.
+2. **A standalone browser-based analysis suite** that parses CSV logs, computes kinematic indicators, and provides interactive visualizations to support clinical interpretation.
+
+## Key features
+
+- **Local-first workflow**: analysis runs entirely in the browser by default (no cloud, no external servers).
+- **Controller-free interaction**: designed for users with limited grasp capacity (hand tracking).
+- **Mono- and bimanual analysis**: supports unimanual dexterity and bimanual coordination sessions.
+- **Automated metrics and interactive plots**, including:
+  - velocity profiles,
+  - smoothness (Number of Velocity Peaks, NVP),
+  - path efficiency (tortuosity),
+  - functional ROM volume,
+  - head–hand relationship measures (compensation proxy),
+  - left vs. right comparative reporting.
 
 ---
 
-## 🎯 Abstract
+## Repository structure
 
-This repository hosts the source code and software artifacts for the **Rehab-Immersive** system, a comprehensive solution designed to bridge the gap between Immersive Virtual Reality (IVR) therapy and objective clinical assessment.
+To do
 
-The system addresses two critical barriers in neurorehabilitation:
-1.  **Acquisition:** Providing accessible, controller-free serious games that capture high-precision 6DoF motion data using consumer hardware (Meta Quest).
-2.  **Analysis:** Democratizing kinematic assessment via a "local-first" web tool that automatically calculates validated clinical metrics—such as **ROM Volume**, **Tortuosity (Efficiency)**, and **Movement Smoothness (NVP)**—without requiring engineering expertise or cloud dependencies.
+---
 
-## 📋 Table of Contents
+## Quick start (no installation)
 
-1. [Overview](#-overview)
-2. [Repository Structure](#-repository-structure)
-3. [Software Components](#-software-components)
-    - [VR Acquisition (Serious Games)](#1-vr-acquisition-serious-games)
-    - [Web Analysis Tool](#2-kinematic-analysis-web-tool)
-4. [Data Format](#-data-format)
-5. [Installation & Usage](#-installation--usage)
-6. [Citation](#-citation)
-7. [License & Acknowledgments](#-license--acknowledgments)
+### 1) Run the analysis tool locally
+1. Open: `Kinematic_analysis/rehab_kinematic_analysis.html` in a modern desktop browser (Chrome/Edge recommended).
+2. Choose the analysis mode (**Unimanual** / **Bimanual**).
+3. Drag and drop one of the example CSV files from `CSV_Examples/`.
 
-## 🔭 Overview
+This reproduces the full analysis workflow (metrics and plots) without installing anything.
 
-The ecosystem is composed of two independent but complementary modules:
+---
 
-* **VR Acquisition Module:** A set of serious games (Virtual Box & Block Test and Adapted Handball) running on Meta Quest devices. These applications act as the "sensor," logging biomechanical data at 72/90 Hz.
-* **Analysis Module:** A browser-based dashboard that ingests the raw CSV telemetry from the headset and generates interactive 3D visualizations and quantitative clinical reports.
+## Running the VR applications (Meta Quest)
 
-## 📁 Repository Structure
+### Prerequisites
+- Meta Quest 2 or Meta Quest 3
+- Developer Mode enabled
+- An installation method such as:
+  - **Meta Quest Developer Hub (MQDH)**, or
+  - `adb` (Android Platform Tools)
 
-```text
-RehabImmersive-Kinematic-Analysis/
-├── 📂 Serious_Games_VR_apks/    # Standalone Android packages for Meta Quest
-│   ├── RehabImmersive_BBT.apk       # Virtual Box & Block Test (Unimanual)
-│   └── RehabImmersive_Handball.apk  # Adapted Handball Game (Bimanual)
-│
-├── 📂 Kinematic_analysis/       # The Web-Based Analysis Tool
-│   ├── index.html                   # Main entry point (Dashboard)
-│   ├── css/                         # Stylesheets
-│   └── js/                          # Logic (Parsing, Metrics, Plotly/Chart.js)
-│
-├── 📂 CSV_Examples/             # Sample datasets for testing
-│   ├── BBT_Healthy_Sample.csv       # Sample telemetry from vBBT
-│   └── Handball_Patient_Sample.csv  # Sample telemetry from Handball
-│
-├── LICENSE                      # MIT License
-└── README.md                    # Project Documentation
+### Install APKs
+- vBBT: `Serious_Games_VR_apks/BBT_v_2_3.apk`
+- Handball: `Serious_Games_VR_apks/hbt_v_2_2.apk`
+
+You can install using MQDH or via `adb install <apk>`.
+
+### Retrieve the generated CSV logs
+After playing, the applications store the kinematic logs locally on the headset.  
+To retrieve them, use MQDH (File Manager) or `adb pull` to copy the generated `.csv` files to your computer.
+
+Tip: if you do not know the exact output folder or package directory (it may differ between builds), search the headset storage for recently created `*.csv` files after a session.
+
+---
+
+## How to analyze your own recordings
+
+1. Copy the CSV logs from the headset to your computer.
+2. Open `Kinematic_analysis/rehab_kinematic_analysis.html`.
+3. Select:
+   - **Unimanual** for vBBT sessions, or
+   - **Bimanual** for Handball sessions.
+4. Upload the CSV.
+5. Use:
+   - the **ROI controls** to exclude calibration or rest frames,
+   - the **playback** to relate peaks to movement phases,
+   - the plots to inspect 2D/3D trajectories and time evolution.
+
+---
+
+## Scope note (naming)
+
+This repository contains the **kinematic acquisition-and-analysis subset** of the broader Rehab-Immersive platform.  
+In the manuscript, it is recommended to refer to this contribution consistently as:
+
+- **Rehab-Immersive kinematic assessment pipeline** (recommended wording), or
+- **Rehab-Immersive kinematic module**.
+
+---
+
+## Citation
+
+If you use this repository in academic work, please cite:
+1. The SoftwareX paper describing this kinematic module/pipeline (to be added once published).
+2. The Rehab-Immersive framework paper:
+
+### BibTeX
+```bibtex
+@article{Herrera2023,
+  title = {Rehab-Immersive: A framework to support the development of virtual reality applications in upper limb rehabilitation},
+  author = {Herrera, Vanesa and Vallejo, David and Castro-Schez, Jose J. and Monekosso, Dorothy N. and de los Reyes, Ana and Glez-Morcillo, Carlos and Albusac, Javier},
+  journal = {SoftwareX},
+  volume = {23},
+  pages = {101412},
+  year = {2023},
+  doi = {10.1016/j.softx.2023.101412}
+}
+
+## License
+
+This project is released under the **MIT License**. See `LICENSE`.
+
+## Contributors / Contact
+
+- **Javier Albusac** (corresponding author): javieralonso.albusac@uclm.es  
+- **Vanesa Herrera**  
+- **AIR Research Group**, University of Castilla-La Mancha (UCLM)  
+- **Biomechanics and Technical Aids Unit**, National Hospital for Paraplegics (Toledo, Spain)
+
+## Acknowledgments
+
+This work has been conducted within the scope of the Spanish national research project **Rehab-Immersive** and has been supported by the Spanish Ministry of Science, Innovation and Universities under grants **PID2020-117361RB-C21** and **PID2020-117361RB-C22**. The authors also acknowledge the collaboration of the **National Hospital for Paraplegics (Toledo, Spain)**, in particular the **Biomechanics and Technical Aids Unit**, for their clinical guidance and o
+::contentReference[oaicite:0]{index=0}
