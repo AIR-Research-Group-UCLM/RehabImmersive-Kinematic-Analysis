@@ -129,5 +129,4 @@ This project is released under the **MIT License**. See `LICENSE`.
 
 ## Acknowledgments
 
-This work has been conducted within the scope of the Spanish national research project **Rehab-Immersive** and has been supported by the Spanish Ministry of Science, Innovation and Universities under grants **PID2020-117361RB-C21** and **PID2020-117361RB-C22**. The authors also acknowledge the collaboration of the **National Hospital for Paraplegics (Toledo, Spain)**, in particular the **Biomechanics and Technical Aids Unit**, for their clinical guidance and o
-::contentReference[oaicite:0]{index=0}
+This work has been conducted within the scope of the Spanish national research project **Rehab-Immersive** and has been supported by the Spanish Ministry of Science, Innovation and Universities under grants **PID2020-117361RB-C21** and **PID2020-117361RB-C22**. The authors also acknowledge the collaboration of the **National Hospital for Paraplegics (Toledo, Spain)**, in particular the **Biomechanics and Technical Aids Unit**.
