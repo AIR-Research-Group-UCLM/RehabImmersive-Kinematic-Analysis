@@ -27,20 +27,23 @@ The module includes:
 
 ## Repository structure
 
-├── CSV_Examples
-│   ├── BBT_1.csv
-│   ├── BBT_2.csv
-│   ├── HANDBALL_2_2_1_11_26_2025.csv
-│   └── HANDBALL_3_2_1_11_26_2025.csv
-├── Kinematic_analysis
-│   └── rehab_kinematic_analysis.html
-├── LICENSE
-├── README.md
-└── Serious_Games_VR_apks
-    ├── BBT_v_2_3.apk
-    └── hbt_v_2_2.apk
+## Repository structure
 
----
+```text
+RehabImmersive-Kinematic-Analysis/
+├── CSV_Examples/
+│   ├── BBT_1.csv
+│   ├── BBT_2.csv
+│   ├── HANDBALL_2_2_1_11_26_2025.csv
+│   └── HANDBALL_3_2_1_11_26_2025.csv
+├── Kinematic_analysis/
+│   └── rehab_kinematic_analysis.html
+├── Serious_Games_VR_apks/
+│   ├── BBT_v_2_3.apk
+│   └── hbt_v_2_2.apk
+├── LICENSE
+└── README.md
+
 ## Running the VR applications (Meta Quest)
 
 ### Prerequisites
