@@ -24,25 +24,23 @@ The module includes:
   - head–hand relationship measures (compensation proxy),
   - left vs. right comparative reporting.
 
----
 
 ## Repository structure
 
-To do
+├── CSV_Examples
+│   ├── BBT_1.csv
+│   ├── BBT_2.csv
+│   ├── HANDBALL_2_2_1_11_26_2025.csv
+│   └── HANDBALL_3_2_1_11_26_2025.csv
+├── Kinematic_analysis
+│   └── rehab_kinematic_analysis.html
+├── LICENSE
+├── README.md
+└── Serious_Games_VR_apks
+    ├── BBT_v_2_3.apk
+    └── hbt_v_2_2.apk
 
 ---
-
-## Quick start (no installation)
-
-### 1) Run the analysis tool locally
-1. Open: `Kinematic_analysis/rehab_kinematic_analysis.html` in a modern desktop browser (Chrome/Edge recommended).
-2. Choose the analysis mode (**Unimanual** / **Bimanual**).
-3. Drag and drop one of the example CSV files from `CSV_Examples/`.
-
-This reproduces the full analysis workflow (metrics and plots) without installing anything.
-
----
-
 ## Running the VR applications (Meta Quest)
 
 ### Prerequisites
@@ -62,7 +60,15 @@ You can install using MQDH or via `adb install <apk>`.
 After playing, the applications store the kinematic logs locally on the headset.  
 To retrieve them, use MQDH (File Manager) or `adb pull` to copy the generated `.csv` files to your computer.
 
-Tip: if you do not know the exact output folder or package directory (it may differ between builds), search the headset storage for recently created `*.csv` files after a session.
+
+## Quick start (no installation)
+
+### 1) Run the analysis tool locally
+1. Open: `Kinematic_analysis/rehab_kinematic_analysis.html` in a modern desktop browser.
+2. Choose the analysis mode (**Unimanual** / **Bimanual**).
+3. Drag and drop one of the example CSV files from `CSV_Examples/`.
+
+This reproduces the full analysis workflow (metrics and plots) without installing anything.
 
 ---
 
@@ -78,16 +84,6 @@ Tip: if you do not know the exact output folder or package directory (it may dif
    - the **ROI controls** to exclude calibration or rest frames,
    - the **playback** to relate peaks to movement phases,
    - the plots to inspect 2D/3D trajectories and time evolution.
-
----
-
-## Scope note (naming)
-
-This repository contains the **kinematic acquisition-and-analysis subset** of the broader Rehab-Immersive platform.  
-In the manuscript, it is recommended to refer to this contribution consistently as:
-
-- **Rehab-Immersive kinematic assessment pipeline** (recommended wording), or
-- **Rehab-Immersive kinematic module**.
 
 ---
 
@@ -109,8 +105,9 @@ This project is released under the **MIT License**. See `LICENSE`.
 
 - **Javier Albusac** (corresponding author): javieralonso.albusac@uclm.es  
 - **Vanesa Herrera**  
-- **AIR Research Group**, University of Castilla-La Mancha (UCLM)  
-- **Biomechanics and Technical Aids Unit**, National Hospital for Paraplegics (Toledo, Spain)
+- **David Vallejo** 
+- **Ana de los Reyes Guzmán**
+- **Carlos González Morcillo**
 
 ## Acknowledgments
 
