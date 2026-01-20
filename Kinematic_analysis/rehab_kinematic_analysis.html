@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rehab Immersive - Dashboard (English)</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* --- RESET & VARIABLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg0: #070A12;
+            --primary-color: #5482FF;
+            --secondary-color: #BE64FF;
+            --accent-color: #3CFFC8;
+            --stroke: rgba(255,255,255,.14);
+            --text-primary: rgba(255,255,255,.92);
+            --text-secondary: rgba(255,255,255,.70);
+            --text-muted: rgba(255,255,255,.55);
+            --card-bg: rgba(255,255,255,.06);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+            background: radial-gradient(at top right, #1a1f35 0%, #070A12 100%);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 0.5rem 1rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            flex: 0 0 auto;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--stroke);
+            background: rgba(255,255,255,.05);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 1.4rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header h2 { font-size: 0.9rem; color: var(--text-secondary); margin-left: 1rem; display: inline-block; }
+
+        /* --- UPLOAD OVERLAY --- */
+        .upload-section {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(11, 16, 32, 0.95); backdrop-filter: blur(15px);
+            border: 2px dashed rgba(255,255,255,.26); border-radius: var(--radius);
+            padding: 2rem 3rem; text-align: center; z-index: 100;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 450px;
+        }
+        .upload-section.drag-over { border-color: var(--accent-color); background: rgba(60,255,200,.12); }
+        .upload-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .upload-text { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 1.5rem;}
+        input[type="file"] { display: none; }
+
+        .mode-selector {
+            display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem;
+            background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mode-label {
+            cursor: pointer; font-size: 0.9rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;
+        }
+        .mode-label:hover { color: var(--text-primary); }
+        .mode-label input { appearance: none; width: 14px; height: 14px; border: 2px solid var(--text-muted); border-radius: 50%; margin-right: 4px; display: inline-block; position: relative; }
+        .mode-label input:checked { border-color: var(--accent-color); }
+        .mode-label input:checked::after { content: ''; position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; }
+        .mode-label input:checked + span { color: var(--accent-color); font-weight: 600; }
+
+        /* --- LAYOUT GRID --- */
+        .analysis-section {
+            display: none;
+            flex: 1; 
+            gap: 0.75rem;
+            min-height: 0;
+        }
+        .analysis-section.active {
+            display: grid;
+            grid-template-columns: auto 380px 1fr; 
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.5rem; }
+
+        .nav-button {
+            background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%); 
+            backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px; padding: 0.5rem; color: white;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            writing-mode: vertical-lr; transform: rotate(180deg);
+            height: 100px; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-button:hover { background: linear-gradient(135deg, #B066CF 0%, #835CC5 100%); transform: rotate(180deg) translateY(3px); }
+        .nav-button.active { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); border-color: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(142, 45, 226, 0.6); }
+
+        /* --- PANELS --- */
+        .panel-base {
+            background: var(--card-bg); border: 1px solid var(--stroke);
+            border-radius: var(--radius); padding: 0.75rem;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* --- DATA PANEL --- */
+        .data-panel-content { display: flex; flex-direction: column; height: 100%; gap: 0.5rem; }
+
+        .control-group {
+            background: rgba(0,0,0,0.3); padding: 0.5rem;
+            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 0.25rem; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.5rem;
+        }
+
+        /* Player */
+        .player-row { display: flex; align-items: center; gap: 0.75rem; }
+        .ctrl-btn {
+            background: var(--primary-color); border: none; color: white;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .ctrl-btn:hover { background: var(--secondary-color); transform: scale(1.1); }
+        
+        .playback-slider-container { flex: 1; display: flex; align-items: center; }
+        input[type="range"].playback-slider {
+            -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px;
+            background: rgba(255,255,255,0.15); outline: none; cursor: pointer;
+        }
+        input[type="range"].playback-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+            border-radius: 50%; background: var(--accent-color); border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(60,255,200,0.5); margin-top: 0px; 
+            transition: transform 0.1s;
+        }
+        input[type="range"].playback-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        .frame-counter { font-size: 0.75rem; color: var(--text-primary); min-width: 60px; text-align: right; font-weight: bold; }
+
+        /* ROI Sliders */
+        .roi-container { display: flex; flex-direction: column; gap: 0.5rem; }
+        .roi-row { display: flex; align-items: center; gap: 10px; }
+        .roi-label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; min-width: 60px; }
+        .roi-slider-wrapper { flex: 1; display: flex; align-items: center; }
+        .roi-val { font-size: 0.75rem; color: var(--accent-color); font-weight: bold; min-width: 50px; text-align: right; margin-left: 8px; }
+        
+        input[type="range"].roi-slider {
+            -webkit-appearance: none; width: 100%; height: 5px; border-radius: 3px;
+            background: rgba(255,255,255,0.1); outline: none; cursor: pointer;
+        }
+        input[type="range"].roi-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: var(--secondary-color); border: 2px solid white;
+        }
+
+        /* COMPENSATION REF */
+        .ref-hand-row {
+            display: none; 
+            align-items: center; justify-content: space-between;
+            font-size: 0.7rem; color: var(--text-secondary);
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;
+        }
+        .ref-hand-selector {
+            display: flex; gap: 1rem;
+        }
+        .ref-label { cursor: pointer; display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted); transition: color 0.2s; }
+        .ref-label:hover { color: var(--text-primary); }
+        .ref-label input { width: 12px; height: 12px; }
+        .ref-label input:checked + span { color: var(--accent-color); font-weight: bold; }
+
+        .panel-title {
+            font-size: 0.85rem; font-weight: 700; color: var(--accent-color);
+            border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: 0.25rem;
+            margin-bottom: 0.25rem; flex-shrink: 0;
+        }
+
+        /* COMPACT TABLES */
+        .table-wrapper {
+            flex: 0 1 auto; 
+            max-height: 90px; /* Limit to ~3 rows */
+            min-height: 60px;
+            overflow-y: auto;
+            background: rgba(0,0,0,.2); border-radius: 8px; margin-bottom: 0.25rem;
+            scroll-behavior: auto;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th { background: rgba(0,0,0,.9); position: sticky; top: 0; z-index: 10; padding: 4px 8px; text-align: right; color: var(--text-secondary); }
+        td { padding: 3px 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,.05); color: var(--text-muted); cursor: pointer; }
+        .selected-row td { background: rgba(60, 255, 200, 0.25) !important; color: white !important; font-weight: 600; }
+
+        /* EXPANDED METRICS */
+        .metrics-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+            flex-shrink: 0;
+            overflow-y: visible; 
+            max-height: none; 
+            flex: 1 0 auto; 
+        }
+        .metric-card {
+            background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; padding: 0.4rem; text-align: left;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .metric-label { font-size: 0.55rem; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-value { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
+        .metric-unit { font-size: 0.6rem; color: var(--text-muted); margin-left: 2px; font-weight: 400; }
+
+        /* DESCRIPTION BUTTON */
+        .btn-description {
+            width: 100%; background: linear-gradient(135deg, rgba(84,130,255,0.2) 0%, rgba(190,100,255,0.2) 100%);
+            border: 1px solid rgba(255,255,255,0.2); color: var(--accent-color);
+            padding: 0.7rem; border-radius: 8px; margin-top: 0.5rem; cursor: pointer;
+            font-weight: 600; font-size: 0.8rem; transition: all 0.2s;
+            text-align: center; flex-shrink: 0;
+        }
+        .btn-description:hover { background: linear-gradient(135deg, rgba(84,130,255,0.4) 0%, rgba(190,100,255,0.4) 100%); transform: translateY(-2px); }
+
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #0B1020; border: 1px solid var(--accent-color);
+            margin: 5% auto; padding: 2rem; width: 80%; max-width: 800px;
+            border-radius: 14px; position: relative; max-height: 80vh; overflow-y: auto;
+            color: #ccc; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-modal:hover { color: white; }
+        .modal h2 { color: var(--accent-color); margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+        .modal h4 { color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .modal p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.5rem; }
+        .modal li { margin-bottom: 0.5rem; margin-left: 1.5rem; }
+
+        /* VIZ AREA */
+        .viz-layout { display: grid; grid-template-rows: 58% 1fr; gap: 0.75rem; height: 100%; }
+        .viz-top { display: flex; flex-direction: column; min-height: 0; position: relative; }
+        .viz-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; min-height: 0; }
+        .sub-chart {
+            background: rgba(0,0,0,0.2); border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem;
+            display: flex; flex-direction: column; min-height: 0;
+        }
+
+        .controls-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; justify-content: center; flex-shrink: 0; }
+        .plane-button {
+            appearance: none; background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 50px;
+            padding: 0.4rem 1.2rem; color: white; font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .plane-button:hover { background: linear-gradient(135deg, #B066CF 0%, #835CC5 100%); transform: translateY(-2px); }
+        .plane-button.active { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); border-color: rgba(255,255,255,0.8); box-shadow: 0 0 10px rgba(142, 45, 226, 0.5); }
+
+        #scatterChart, #view3DContainer, #position2DChart { flex: 1; width: 100%; height: 100%; min-height: 0; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div><h1>Rehab Immersive</h1><h2>Upper Limb Rehabilitation</h2></div>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <div class="mode-selector">
+                <label class="mode-label">
+                    <input type="radio" name="analysisMode" value="mono" checked onchange="App.setMode('mono')">
+                    <span>Unimanual</span>
+                </label>
+                <label class="mode-label">
+                    <input type="radio" name="analysisMode" value="bi" onchange="App.setMode('bi')">
+                    <span>Bimanual</span>
+                </label>
+            </div>
+            <div class="upload-icon">📊</div>
+            <div class="upload-text" id="uploadText">Drag & Drop Unimanual CSV</div>
+            <input type="file" id="fileInput" accept=".csv">
+        </div>
+
+        <div class="analysis-section" id="analysisSection">
+            <div class="sidebar" id="sidebarNav"></div>
+
+            <div class="panel-base">
+                <div class="data-panel-content">
+                    
+                    <div class="control-group">
+                        <div class="player-row">
+                            <button class="ctrl-btn" id="playBtn" onclick="Playback.togglePlay()"><i class="fas fa-play"></i></button>
+                            <button class="ctrl-btn" id="stopBtn" onclick="Playback.stopPlay()" style="display:none; background: #ef4444;"><i class="fas fa-stop"></i></button>
+                            <div class="playback-slider-container">
+                                <input type="range" id="playbackSlider" class="playback-slider" min="0" value="0" step="1" oninput="Playback.manualSeek(this.value)">
+                            </div>
+                            <div class="frame-counter" id="frameCounter">-</div>
+                        </div>
+
+                        <div class="roi-container">
+                            <div class="roi-row">
+                                <span class="roi-label">START</span>
+                                <div class="roi-slider-wrapper">
+                                    <input type="range" id="cropStartSlider" class="roi-slider" min="0" value="0" oninput="App.updateCrop('start')">
+                                </div>
+                                <span class="roi-val" id="cropStartVal">-</span>
+                            </div>
+                            <div class="roi-row">
+                                <span class="roi-label">END</span>
+                                <div class="roi-slider-wrapper">
+                                    <input type="range" id="cropEndSlider" class="roi-slider" min="0" value="100" oninput="App.updateCrop('end')">
+                                </div>
+                                <span class="roi-val" id="cropEndVal">-</span>
+                            </div>
+                        </div>
+
+                        <div class="ref-hand-row" id="refHandRow">
+                            <span class="roi-label" style="width:auto">COMP. REFERENCE:</span>
+                            <div class="ref-hand-selector">
+                                <label class="ref-label">
+                                    <input type="radio" name="refHand" value="left" onchange="App.updateRefHand()">
+                                    <span>Left</span>
+                                </label>
+                                <label class="ref-label">
+                                    <input type="radio" name="refHand" value="right" checked onchange="App.updateRefHand()">
+                                    <span>Right</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="panel-title" id="positionTitle">Position</h3>
+                    <div class="table-wrapper" id="posTableWrapper">
+                        <table id="positionTable"><thead><tr><th>Frame</th><th>X</th><th>Y</th><th>Z</th></tr></thead><tbody id="positionTableBody"></tbody></table>
+                    </div>
+
+                    <h3 class="panel-title" id="rotationTitle">Rotation</h3>
+                    <div class="table-wrapper" id="rotTableWrapper">
+                        <table id="rotationTable"><thead><tr><th>Frame</th><th>X</th><th>Y</th><th>Z</th></tr></thead><tbody id="rotationTableBody"></tbody></table>
+                    </div>
+
+                    <div class="metrics-grid" id="metricsContainer"></div>
+                    
+                    <button class="btn-description" onclick="UI.openModal()">
+                        <i class="fas fa-info-circle"></i> Metrics Description
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-base">
+                <div class="viz-layout">
+                    <div class="viz-top">
+                        <div class="controls-row">
+                            <button class="plane-button active" data-plane="xy" onclick="Charts.changePlane('xy')">XY Plane</button>
+                            <button class="plane-button" data-plane="xz" onclick="Charts.changePlane('xz')">XZ Plane</button>
+                            <button class="plane-button" data-plane="yz" onclick="Charts.changePlane('yz')">YZ Plane</button>
+                            <div style="width: 1px; background: rgba(255,255,255,0.2); margin: 0 10px;"></div>
+                            <button class="plane-button" id="view3DBtn" onclick="Charts.toggle3DView()">3D View</button>
+                        </div>
+                        <div id="scatterChart"></div>
+                        <div id="view3DContainer" style="display: none;"></div>
+                    </div>
+                    <div class="viz-bottom">
+                        <div class="sub-chart">
+                            <h3 class="panel-title">Temporal Evolution</h3>
+                            <div id="position2DChart"></div>
+                        </div>
+                        <div class="sub-chart">
+                            <h3 class="panel-title" id="polarTitle">Polar Space (XY)</h3>
+                            <div style="flex:1; position: relative; display: flex; justify-content: center; align-items: center; min-height: 0;">
+                                <canvas id="polarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="metricsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="UI.closeModal()">&times;</span>
+            <h2>📊 Clinical Metrics Glossary</h2>
+            
+            <h4>ROM Volume (m³)</h4>
+            <p>Total 3D space occupied by the movement, calculated as the Bounding Box volume.</p>
+
+            <h4>Range of Motion (X, Y, Z)</h4>
+            <p>Maximum amplitude reached along each anatomical axis.</p>
+
+            <h4>Avg Velocity (m/s)</h4>
+            <p>Average velocity of the selected end-effector (hand or head) during the task.</p>
+
+            <h4>Tortuosity Index (Local Average)</h4>
+            <p>Average ratio between actual path length and straight chord distance, calculated in sliding windows of 5 frames (~0.07s). This metric is <strong>independent of task duration</strong>.</p>
+            <ul>
+                <li><strong>1.00 - 1.05:</strong> Robotic/Perfect movement.</li>
+                <li><strong>1.05 - 1.30:</strong> Healthy human range.</li>
+                <li><strong>> 1.35:</strong> Indicates tremor, ataxia, or motor inefficiency.</li>
+            </ul>
+
+            <h4>Head Displacement (m)</h4>
+            <p>Total accumulated distance traveled by the head. A high value indicates trunk compensation strategies.</p>
+
+            <h4>Hand Displacement (m)</h4>
+            <p>Total accumulated distance traveled by the hand.</p>
+
+            <h4>Compensation Ratio (%)</h4>
+            <p>Percentage of movement contributed by the head relative to the reference hand movement.</p>
+            <ul>
+                <li><strong>< 10%:</strong> Normal (postural stability).</li>
+                <li><strong>> 20%:</strong> Excessive compensation (pathological strategy).</li>
+            </ul>
+
+            <h4>Velocity Peaks (NVP)</h4>
+            <p>Number of times the velocity profile increases and then decreases (local accelerations). A simplified "Gold Standard" for measuring movement <strong>smoothness</strong>.</p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * REHAB IMMERSIVE DASHBOARD - V16 (English)
+         * License: MIT
+         * * This code provides visualization and kinematic analysis for 
+         * Upper Limb Rehabilitation data (CSV).
+         */
+
+        // ==========================================
+        // 1. CONFIGURATION & CONSTANTS
+        // ==========================================
+        const Config = {
+            TORTUOSITY_WINDOW: 5,  // Sliding window size for local tortuosity calculation
+            DISPLAY_LIMIT: 1500,   // Max rows to render in HTML tables for performance
+            VELOCITY_SMOOTHING: 2, // Neighbors to smooth velocity (±2)
+            PLAYBACK_SPEED: 50,    // Interval in ms
+            COLORS: {
+                X: '#ef4444',
+                Y: '#22c55e',
+                Z: '#3b82f6',
+                TRAJECTORY: 'rgba(37, 99, 235, 0.2)'
+            }
+        };
+
+        // ==========================================
+        // 2. APP STATE MANAGEMENT
+        // ==========================================
+        const AppState = {
+            csvData: [],
+            allFrames: [],
+            analysisMode: 'mono', // 'mono' or 'bi'
+            currentView: 'head',  // 'head', 'hand', 'left', 'right'
+            referenceHand: 'right', // For compensation calculation in Bimanual
+            
+            // Playback State
+            isPlaying: false,
+            playInterval: null,
+            selectedFrameIndex: null,
+            
+            // ROI (Region of Interest)
+            cropStartIndex: 0,
+            cropEndIndex: 0,
+
+            // Charts State
+            currentPlane: 'xy',
+            is3DViewActive: false,
+            polarChartInstance: null
+        };
+
+        // ==========================================
+        // 3. MATH UTILITIES
+        // ==========================================
+        const MathUtils = {
+            euclideanDist: (p1, p2) => {
+                return Math.sqrt(
+                    Math.pow(p2.x - p1.x, 2) +
+                    Math.pow(p2.y - p1.y, 2) +
+                    Math.pow(p2.z - p1.z, 2)
+                );
+            },
+
+            calculatePathLength: (positions) => {
+                let dist = 0;
+                for (let i = 1; i < positions.length; i++) {
+                    dist += MathUtils.euclideanDist(positions[i-1], positions[i]);
+                }
+                return dist;
+            }
+        };
+
+        // ==========================================
+        // 4. METRICS ENGINE (Domain Logic)
+        // ==========================================
+        const MetricsEngine = {
+            /**
+             * Extract 3D points for a specific body part from the dataset slice.
+             */
+            extractPositions: (dataSlice, prefix) => {
+                return dataSlice.map(row => {
+                    const x = parseFloat(row[`${prefix}Position_x`]);
+                    const y = parseFloat(row[`${prefix}Position_y`]);
+                    const z = parseFloat(row[`${prefix}Position_z`]);
+                    return (isNaN(x) || isNaN(y) || isNaN(z)) ? null : {x, y, z};
+                }).filter(p => p !== null);
+            },
+
+            calculateVolume: (positions) => {
+                if (positions.length === 0) return { volume: 0, xRange: 0, yRange: 0, zRange: 0 };
+                const xV = positions.map(p => p.x);
+                const yV = positions.map(p => p.y);
+                const zV = positions.map(p => p.z);
+                const xRange = Math.max(...xV) - Math.min(...xV);
+                const yRange = Math.max(...yV) - Math.min(...yV);
+                const zRange = Math.max(...zV) - Math.min(...zV);
+                return {
+                    volume: xRange * yRange * zRange,
+                    xRange, yRange, zRange
+                };
+            },
+
+            calculateVelocityData: (positions, times) => {
+                let pathDist = 0;
+                let velocities = [];
+                for (let i = 1; i < positions.length; i++) {
+                    const d = MathUtils.euclideanDist(positions[i-1], positions[i]);
+                    pathDist += d;
+                    const dt = times[i] - times[i-1];
+                    velocities.push(dt > 0 ? d / dt : 0);
+                }
+                const totalTime = times[times.length - 1] - times[0];
+                const avgVelocity = totalTime > 0 ? pathDist / totalTime : 0;
+                return { avgVelocity, velocities };
+            },
+
+            /**
+             * New Algorithm: Local Average Tortuosity (Sliding Window)
+             */
+            calculateTortuosity: (positions) => {
+                const win = Config.TORTUOSITY_WINDOW;
+                let localRatios = [];
+
+                for (let i = 0; i <= positions.length - win; i++) {
+                    let arc = 0;
+                    // Calculate arc length inside the window
+                    for (let j = 0; j < win - 1; j++) {
+                        arc += MathUtils.euclideanDist(positions[i+j], positions[i+j+1]);
+                    }
+                    // Calculate chord (straight line)
+                    const chord = MathUtils.euclideanDist(positions[i], positions[i+win-1]);
+
+                    if (chord > 0.001) {
+                        localRatios.push(arc / chord);
+                    }
+                }
+                
+                if (localRatios.length === 0) return 1.0;
+                return localRatios.reduce((a, b) => a + b, 0) / localRatios.length;
+            },
+
+            calculateVelocityPeaks: (velocities) => {
+                let smoothVel = [];
+                const neighbor = Config.VELOCITY_SMOOTHING;
+                
+                // Smoothing (Moving Average)
+                for (let i = 0; i < velocities.length; i++) {
+                    let sum = 0, count = 0;
+                    for (let j = Math.max(0, i - neighbor); j <= Math.min(velocities.length - 1, i + neighbor); j++) {
+                        sum += velocities[j];
+                        count++;
+                    }
+                    smoothVel.push(sum / count);
+                }
+
+                // Peak Counting
+                let peaks = 0;
+                const threshold = Math.max(...smoothVel) * 0.05; // 5% of max velocity
+                for (let i = 1; i < smoothVel.length - 1; i++) {
+                    if (smoothVel[i] > smoothVel[i-1] && 
+                        smoothVel[i] > smoothVel[i+1] && 
+                        smoothVel[i] > threshold) {
+                        peaks++;
+                    }
+                }
+                return peaks;
+            },
+
+            // Main Orchestrator for Metrics
+            computeAll: (dataSlice, prefix) => {
+                const positions = MetricsEngine.extractPositions(dataSlice, prefix);
+                const times = dataSlice.map(row => parseFloat(row['Time']));
+
+                // Base Checks
+                if (positions.length < 5) return null;
+
+                // 1. Volume & Ranges
+                const volMetrics = MetricsEngine.calculateVolume(positions);
+
+                // 2. Velocity & Peaks
+                const velMetrics = MetricsEngine.calculateVelocityData(positions, times);
+                const velPeaks = MetricsEngine.calculateVelocityPeaks(velMetrics.velocities);
+
+                // 3. Tortuosity
+                const tortuosity = MetricsEngine.calculateTortuosity(positions);
+
+                // 4. Specific Distances (Hands & Head)
+                // Determine Hand Prefixes
+                let handRefPrefix = 'Hand'; // Default Mono
+                if (AppState.analysisMode === 'mono') {
+                    handRefPrefix = (AppState.csvData[0]['HandPosition_x'] !== undefined) ? 'Hand' : 'RHand';
+                } else {
+                    handRefPrefix = (AppState.referenceHand === 'left') ? 'LHand' : 'RHand';
+                }
+
+                const headPos = MetricsEngine.extractPositions(dataSlice, 'Head');
+                const refHandPos = MetricsEngine.extractPositions(dataSlice, handRefPrefix);
+                
+                const headDist = MathUtils.calculatePathLength(headPos);
+                const effectorDist = MathUtils.calculatePathLength(refHandPos); // Denominator for compensation
+
+                let leftDist = 0, rightDist = 0, monoHandDist = 0;
+                
+                if (AppState.analysisMode === 'bi') {
+                    leftDist = MathUtils.calculatePathLength(MetricsEngine.extractPositions(dataSlice, 'LHand'));
+                    rightDist = MathUtils.calculatePathLength(MetricsEngine.extractPositions(dataSlice, 'RHand'));
+                } else {
+                    monoHandDist = MathUtils.calculatePathLength(MetricsEngine.extractPositions(dataSlice, handRefPrefix));
+                }
+
+                // 5. Compensation Ratio
+                const compRatio = effectorDist > 0 ? (headDist / effectorDist) * 100 : 0;
+
+                return {
+                    ...volMetrics,
+                    avgVelocity: velMetrics.avgVelocity,
+                    tortuosity,
+                    velPeaks,
+                    headDisp: headDist,
+                    compRatio,
+                    leftDist, rightDist, monoHandDist
+                };
+            }
+        };
+
+        // ==========================================
+        // 5. UI CONTROLLER (DOM Manipulation)
+        // ==========================================
+        const UI = {
+            els: {
+                fileInput: document.getElementById('fileInput'),
+                uploadSection: document.getElementById('uploadSection'),
+                analysisSection: document.getElementById('analysisSection'),
+                sidebar: document.getElementById('sidebarNav'),
+                metricsContainer: document.getElementById('metricsContainer'),
+                posTableBody: document.getElementById('positionTableBody'),
+                rotTableBody: document.getElementById('rotationTableBody'),
+                frameCounter: document.getElementById('frameCounter'),
+                playbackSlider: document.getElementById('playbackSlider'),
+                cropStartSlider: document.getElementById('cropStartSlider'),
+                cropEndSlider: document.getElementById('cropEndSlider'),
+                cropStartVal: document.getElementById('cropStartVal'),
+                cropEndVal: document.getElementById('cropEndVal'),
+                metricsModal: document.getElementById('metricsModal'),
+                refHandRow: document.getElementById('refHandRow'),
+                uploadText: document.getElementById('uploadText')
+            },
+
+            initDOMEvents: () => {
+                // Upload Events
+                const { els } = UI;
+                els.uploadSection.addEventListener('click', (e) => { 
+                    if (!['INPUT', 'LABEL', 'SPAN'].includes(e.target.tagName)) els.fileInput.click(); 
+                });
+                els.uploadSection.addEventListener('dragover', (e) => { e.preventDefault(); els.uploadSection.classList.add('drag-over'); });
+                els.uploadSection.addEventListener('dragleave', () => { els.uploadSection.classList.remove('drag-over'); });
+                els.uploadSection.addEventListener('drop', (e) => { 
+                    e.preventDefault(); 
+                    els.uploadSection.classList.remove('drag-over'); 
+                    if (e.dataTransfer.files.length) App.handleFile(e.dataTransfer.files[0]); 
+                });
+                els.fileInput.addEventListener('change', (e) => { 
+                    if (e.target.files.length) App.handleFile(e.target.files[0]); 
+                });
+
+                // Keyboard Nav
+                document.addEventListener('keydown', (e) => {
+                    if (AppState.selectedFrameIndex !== null && !AppState.isPlaying) {
+                        if (e.key === 'ArrowUp') { 
+                            e.preventDefault(); 
+                            App.selectFrame(Math.max(0, AppState.selectedFrameIndex - 1), true); 
+                        } else if (e.key === 'ArrowDown') { 
+                            e.preventDefault(); 
+                            App.selectFrame(Math.min(Config.DISPLAY_LIMIT, AppState.selectedFrameIndex + 1), true); 
+                        }
+                    }
+                });
+
+                // Modal
+                window.onclick = (e) => { if (e.target == els.metricsModal) UI.closeModal(); };
+            },
+
+            setupSidebar: () => {
+                UI.els.sidebar.innerHTML = '';
+                if (AppState.analysisMode === 'mono') {
+                    UI.createNavBtn('Head', 'head', true);
+                    UI.createNavBtn('Hand', 'hand', false);
+                    UI.els.refHandRow.style.display = 'none';
+                } else {
+                    UI.createNavBtn('Head', 'head', true);
+                    UI.createNavBtn('Left Hand', 'left', false);
+                    UI.createNavBtn('Right Hand', 'right', false);
+                    UI.els.refHandRow.style.display = 'flex';
+                }
+            },
+
+            createNavBtn: (label, target, isActive) => {
+                const btn = document.createElement('button');
+                btn.className = `nav-button ${isActive ? 'active' : ''}`;
+                btn.textContent = label;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    Playback.stopPlay();
+                    AppState.currentView = target;
+                    AppState.selectedFrameIndex = null;
+                    App.updateView();
+                });
+                UI.els.sidebar.appendChild(btn);
+            },
+
+            renderMetrics: (m) => {
+                if (!m) return;
+                
+                let handMetricsHTML = '';
+                if (AppState.analysisMode === 'mono') {
+                    handMetricsHTML = `<div class="metric-card"><div class="metric-label">Hand Disp.</div><div class="metric-value">${m.monoHandDist.toFixed(3)}<span class="metric-unit">m</span></div></div>`;
+                } else {
+                    handMetricsHTML = `
+                        <div class="metric-card"><div class="metric-label">L. Hand Disp.</div><div class="metric-value">${m.leftDist.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                        <div class="metric-card"><div class="metric-label">R. Hand Disp.</div><div class="metric-value">${m.rightDist.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                    `;
+                }
+
+                UI.els.metricsContainer.innerHTML = `
+                    <div class="metric-card"><div class="metric-label">ROM Volume</div><div class="metric-value">${m.volume.toFixed(5)}<span class="metric-unit">m³</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Range X</div><div class="metric-value">${m.xRange.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Range Y</div><div class="metric-value">${m.yRange.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Range Z</div><div class="metric-value">${m.zRange.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Avg Velocity</div><div class="metric-value">${m.avgVelocity.toFixed(3)}<span class="metric-unit">m/s</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Tortuosity</div><div class="metric-value">${m.tortuosity.toFixed(2)}</div></div>
+                    <div class="metric-card"><div class="metric-label">Head Disp.</div><div class="metric-value">${m.headDisp.toFixed(3)}<span class="metric-unit">m</span></div></div>
+                    ${handMetricsHTML}
+                    <div class="metric-card"><div class="metric-label">Compensation</div><div class="metric-value">${m.compRatio.toFixed(1)}<span class="metric-unit">%</span></div></div>
+                    <div class="metric-card"><div class="metric-label">Velocity Peaks</div><div class="metric-value">${m.velPeaks}</div></div>
+                `;
+            },
+
+            renderTables: (prefix) => {
+                UI.els.posTableBody.innerHTML = ''; 
+                UI.els.rotTableBody.innerHTML = '';
+                
+                const posFrag = document.createDocumentFragment();
+                const rotFrag = document.createDocumentFragment();
+                const limit = Math.min(AppState.csvData.length, Config.DISPLAY_LIMIT);
+
+                for(let i = 0; i < limit; i++){
+                    const row = AppState.csvData[i];
+                    const f = AppState.allFrames[i];
+                    
+                    // Helper for safe float parsing
+                    const val = (k) => row[k] ? parseFloat(row[k]).toFixed(3) : '-';
+
+                    const trP = document.createElement('tr');
+                    trP.id = `pos-row-${i}`;
+                    trP.innerHTML = `<td>${f}</td><td>${val(prefix+'Position_x')}</td><td>${val(prefix+'Position_y')}</td><td>${val(prefix+'Position_z')}</td>`;
+                    trP.onclick = () => { Playback.pausePlay(); App.selectFrame(i); };
+                    posFrag.appendChild(trP);
+                    
+                    const trR = document.createElement('tr');
+                    trR.id = `rot-row-${i}`;
+                    trR.innerHTML = `<td>${f}</td><td>${val(prefix+'Rotation_x')}</td><td>${val(prefix+'Rotation_y')}</td><td>${val(prefix+'Rotation_z')}</td>`;
+                    trR.onclick = () => { Playback.pausePlay(); App.selectFrame(i); };
+                    rotFrag.appendChild(trR);
+                }
+                UI.els.posTableBody.appendChild(posFrag);
+                UI.els.rotTableBody.appendChild(rotFrag);
+            },
+
+            highlightRow: (index, autoScroll) => {
+                document.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected-row'));
+                const pRow = document.getElementById(`pos-row-${index}`);
+                const rRow = document.getElementById(`rot-row-${index}`);
+                
+                if(pRow) {
+                    pRow.classList.add('selected-row');
+                    if (autoScroll) pRow.scrollIntoView({block: 'center', behavior: 'auto'});
+                }
+                if(rRow) {
+                    rRow.classList.add('selected-row');
+                    if (autoScroll) rRow.scrollIntoView({block: 'center', behavior: 'auto'});
+                }
+            },
+
+            updatePlaybackSlider: (val, max) => {
+                const slider = UI.els.playbackSlider;
+                if(parseInt(slider.value) !== val) slider.value = val;
+                const pct = (val / max) * 100;
+                slider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`;
+                UI.els.frameCounter.textContent = AppState.allFrames[val];
+            },
+
+            updateTitles: (viewName) => {
+                document.getElementById('positionTitle').textContent = `Position (${viewName})`;
+                document.getElementById('rotationTitle').textContent = `Rotation (${viewName})`;
+            },
+
+            openModal: () => UI.els.metricsModal.style.display = 'block',
+            closeModal: () => UI.els.metricsModal.style.display = 'none'
+        };
+
+        // ==========================================
+        // 6. CHARTS CONTROLLER (Plotly & Chart.js)
+        // ==========================================
+        const Charts = {
+            commonLayout: {
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { l: 40, r: 20, b: 30, t: 10 }, 
+                font: { color: '#cbd5e1', size: 10 },
+                xaxis: { gridcolor: 'rgba(148, 163, 184, 0.1)', color: '#94a3b8' },
+                yaxis: { gridcolor: 'rgba(148, 163, 184, 0.1)', color: '#94a3b8' },
+                autosize: true
+            },
+
+            updateScatter: (prefix) => {
+                if (typeof Plotly === 'undefined') return;
+                const positions = MetricsEngine.extractPositions(AppState.csvData, prefix);
+                
+                let xData, yData, xLabel, yLabel;
+                switch(AppState.currentPlane) {
+                    case 'xy': xData = positions.map(p=>p.x); yData = positions.map(p=>p.y); xLabel='X'; yLabel='Y'; break;
+                    case 'xz': xData = positions.map(p=>p.x); yData = positions.map(p=>p.z); xLabel='X'; yLabel='Z'; break;
+                    case 'yz': xData = positions.map(p=>p.y); yData = positions.map(p=>p.z); xLabel='Y'; yLabel='Z'; break;
+                }
+
+                const colors = positions.map((_, i) => `rgba(${Math.floor(25 + (i/positions.length) * 230)}, ${Math.floor(102 + (i/positions.length) * 153)}, 230, 0.6)`);
+                
+                const traceMain = { 
+                    x: xData, y: yData, 
+                    mode: 'markers', type: 'scatter', 
+                    marker: { size: 6, color: colors }, 
+                    hovertemplate: `(${xLabel}: %{x:.3f}, ${yLabel}: %{y:.3f})<extra></extra>` 
+                };
+                
+                // Highlight Selected Frame
+                let traceHigh = { x: [], y: [], mode: 'markers', type: 'scatter', marker: { size: 14, color: 'white', symbol: 'cross', line: { color: 'black', width: 2 } }, hoverinfo: 'none' };
+                if (AppState.selectedFrameIndex !== null && positions[AppState.selectedFrameIndex]) {
+                    const p = positions[AppState.selectedFrameIndex];
+                    if (AppState.currentPlane === 'xy') { traceHigh.x = [p.x]; traceHigh.y = [p.y]; }
+                    else if (AppState.currentPlane === 'xz') { traceHigh.x = [p.x]; traceHigh.y = [p.z]; }
+                    else { traceHigh.x = [p.y]; traceHigh.y = [p.z]; }
+                }
+
+                const layout = { 
+                    ...Charts.commonLayout, 
+                    xaxis: { ...Charts.commonLayout.xaxis, title: xLabel, autorange: true }, 
+                    yaxis: { ...Charts.commonLayout.yaxis, title: yLabel, scaleanchor: 'x', scaleratio: 1, autorange: true }, 
+                    hovermode: 'closest', showlegend: false 
+                };
+                Plotly.newPlot('scatterChart', [traceMain, traceHigh], layout, { displayModeBar: true, responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
+            },
+
+            update3D: (prefix) => {
+                const positions = MetricsEngine.extractPositions(AppState.csvData, prefix);
+                const colors = positions.map((_, i) => `rgb(${Math.floor(25 + (i/positions.length) * 230)}, ${Math.floor(102 + (i/positions.length) * 153)}, 230)`);
+                
+                const trace0 = { 
+                    x: positions.map(p => p.x), y: positions.map(p => p.y), z: positions.map(p => p.z), 
+                    mode: 'markers', type: 'scatter3d', 
+                    marker: { size: 3, color: colors, opacity: 0.8 }, 
+                    hovertemplate: 'X: %{x:.3f}<br>Y: %{y:.3f}<br>Z: %{z:.3f}<extra></extra>' 
+                };
+                
+                let traceHigh = { x: [], y: [], z: [], mode: 'markers', type: 'scatter3d', marker: { size: 8, color: 'white', symbol: 'cross' }, hoverinfo: 'none' };
+                if (AppState.selectedFrameIndex !== null && positions[AppState.selectedFrameIndex]) {
+                    const p = positions[AppState.selectedFrameIndex];
+                    traceHigh.x = [p.x]; traceHigh.y = [p.y]; traceHigh.z = [p.z];
+                }
+
+                const layout = { ...Charts.commonLayout, margin: { l: 0, r: 0, b: 0, t: 0 }, 
+                    scene: { 
+                        camera: { up: {x:0, y:1, z:0}, eye: {x:1.5, y:1.5, z:1.5} },
+                        xaxis: { title: 'X', color: '#cbd5e1' }, 
+                        yaxis: { title: 'Y (Height)', color: '#cbd5e1' }, 
+                        zaxis: { title: 'Z', color: '#cbd5e1' }, 
+                        bgcolor: 'rgba(0,0,0,0)' 
+                    }, showlegend: false 
+                };
+                Plotly.newPlot('view3DContainer', [trace0, traceHigh], layout, { displayModeBar: true, responsive: true, displaylogo: false });
+            },
+
+            update2D: (prefix) => {
+                const positions = AppState.csvData.map((row, i) => {
+                    const f = AppState.allFrames[i];
+                    const x = parseFloat(row[`${prefix}Position_x`]);
+                    const y = parseFloat(row[`${prefix}Position_y`]);
+                    const z = parseFloat(row[`${prefix}Position_z`]);
+                    return (isNaN(x) || isNaN(y) || isNaN(z)) ? null : { frame: f, x, y, z };
+                }).filter(p => p !== null);
+                
+                const frames = positions.map(p => p.frame);
+                const traces = [
+                    { x: frames, y: positions.map(p => p.x), type: 'scatter', mode: 'lines', name: 'X', line: { color: Config.COLORS.X, width: 1.5 } },
+                    { x: frames, y: positions.map(p => p.y), type: 'scatter', mode: 'lines', name: 'Y', line: { color: Config.COLORS.Y, width: 1.5 } },
+                    { x: frames, y: positions.map(p => p.z), type: 'scatter', mode: 'lines', name: 'Z', line: { color: Config.COLORS.Z, width: 1.5 } }
+                ];
+
+                const layout = { ...Charts.commonLayout, margin: { l: 30, r: 10, b: 20, t: 10 }, legend: { x: 0, y: 1, font: { size: 9 }, bgcolor: 'rgba(0,0,0,0.5)' }, xaxis: { ...Charts.commonLayout.xaxis, title: 'Real Frame' }, shapes: [] };
+                
+                if (AppState.selectedFrameIndex !== null) {
+                    const fReal = AppState.allFrames[AppState.selectedFrameIndex];
+                    layout.shapes = [{ type: 'line', x0: fReal, x1: fReal, y0: 0, y1: 1, xref: 'x', yref: 'paper', line: { color: 'white', width: 2, dash: 'dot' } }];
+                }
+                Plotly.newPlot('position2DChart', traces, layout, { displayModeBar: true, responsive: true, displaylogo: false });
+            },
+
+            updatePolar: (prefix) => {
+                document.getElementById('polarTitle').textContent = `Polar Space (${AppState.currentPlane.toUpperCase()})`;
+                const slice = AppState.csvData.slice(AppState.cropStartIndex, AppState.cropEndIndex + 1);
+                
+                const rotations = slice.map(row => {
+                    const rx = parseFloat(row[`${prefix}Rotation_x`]);
+                    const ry = parseFloat(row[`${prefix}Rotation_y`]);
+                    const rz = parseFloat(row[`${prefix}Rotation_z`]);
+                    let xVal, yVal;
+                    switch(AppState.currentPlane) {
+                        case 'xy': xVal = rx; yVal = ry; break;
+                        case 'xz': xVal = rx; yVal = rz; break;
+                        case 'yz': xVal = ry; yVal = rz; break;
+                    }
+                    return { x: xVal, y: yVal };
+                }).filter(r => !isNaN(r.x) && !isNaN(r.y));
+
+                const bins = 36;
+                const histogram = new Array(bins).fill(0);
+                rotations.forEach(r => {
+                    let angle = Math.atan2(r.y, r.x) * (180 / Math.PI); 
+                    if (angle < 0) angle += 360;
+                    const mag = Math.sqrt(r.x * r.x + r.y * r.y);
+                    const binIdx = Math.floor(angle / (360 / bins)) % bins;
+                    histogram[binIdx] = Math.max(histogram[binIdx], mag);
+                });
+
+                if (AppState.polarChartInstance) AppState.polarChartInstance.destroy();
+                const ctx = document.getElementById('polarChart').getContext('2d');
+                AppState.polarChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: { labels: Array.from({ length: bins }, (_, i) => `${i * 10}°`), datasets: [{ label: 'Mag', data: histogram, backgroundColor: Config.COLORS.TRAJECTORY, borderColor: 'rgba(6, 182, 212, 1)', borderWidth: 1.5, pointRadius: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false, backdropColor: 'transparent' }, grid: { color: 'rgba(148, 163, 184, 0.2)' }, pointLabels: { color: '#94a3b8', font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+                });
+            },
+
+            changePlane: (plane) => {
+                AppState.currentPlane = plane;
+                document.querySelectorAll('.plane-button').forEach(btn => { if (btn.id !== 'view3DBtn') btn.classList.remove('active'); });
+                document.querySelector(`[data-plane="${plane}"]`).classList.add('active');
+                
+                AppState.is3DViewActive = false;
+                document.getElementById('view3DBtn').classList.remove('active');
+                document.getElementById('scatterChart').style.display = 'block';
+                document.getElementById('view3DContainer').style.display = 'none';
+                
+                const prefix = App.getPrefix(AppState.currentView);
+                Charts.updateScatter(prefix);
+                Charts.updatePolar(prefix);
+            },
+
+            toggle3DView: () => {
+                AppState.is3DViewActive = !AppState.is3DViewActive;
+                const btn = document.getElementById('view3DBtn');
+                if (AppState.is3DViewActive) {
+                    btn.classList.add('active');
+                    document.getElementById('scatterChart').style.display = 'none';
+                    document.getElementById('view3DContainer').style.display = 'block';
+                    document.querySelectorAll('.plane-button').forEach(b => { if (b.id !== 'view3DBtn') b.classList.remove('active'); });
+                    Charts.update3D(App.getPrefix(AppState.currentView));
+                } else {
+                    Charts.changePlane('xy');
+                }
+            }
+        };
+
+        // ==========================================
+        // 7. PLAYBACK CONTROLLER
+        // ==========================================
+        const Playback = {
+            togglePlay: () => {
+                if (AppState.isPlaying) {
+                    Playback.pausePlay();
+                } else {
+                    const playBtn = document.getElementById('playBtn');
+                    const stopBtn = document.getElementById('stopBtn');
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    playBtn.style.background = '#eab308';
+                    stopBtn.style.display = 'flex';
+                    AppState.isPlaying = true;
+
+                    let currentIdx = AppState.selectedFrameIndex !== null ? AppState.selectedFrameIndex : AppState.cropStartIndex;
+                    if (currentIdx < AppState.cropStartIndex || currentIdx >= AppState.cropEndIndex) currentIdx = AppState.cropStartIndex;
+
+                    AppState.playInterval = setInterval(() => {
+                        if (currentIdx > AppState.cropEndIndex) { currentIdx = AppState.cropStartIndex; }
+                        App.selectFrame(currentIdx, true); 
+                        currentIdx++;
+                    }, Config.PLAYBACK_SPEED); 
+                }
+            },
+
+            pausePlay: () => {
+                clearInterval(AppState.playInterval);
+                AppState.isPlaying = false;
+                const playBtn = document.getElementById('playBtn');
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                playBtn.style.background = 'var(--primary-color)';
+            },
+
+            stopPlay: () => {
+                Playback.pausePlay();
+                const stopBtn = document.getElementById('stopBtn');
+                stopBtn.style.display = 'none';
+            },
+
+            manualSeek: (val) => {
+                Playback.pausePlay();
+                App.selectFrame(parseInt(val), true);
+            }
+        };
+
+        // ==========================================
+        // 8. MAIN APP CONTROLLER
+        // ==========================================
+        const App = {
+            init: () => {
+                UI.initDOMEvents();
+                window.addEventListener('resize', () => { 
+                    Plotly.Plots.resize('scatterChart'); 
+                    Plotly.Plots.resize('position2DChart'); 
+                    if(AppState.is3DViewActive) Plotly.Plots.resize('view3DContainer'); 
+                });
+            },
+
+            setMode: (mode) => {
+                AppState.analysisMode = mode;
+                UI.els.uploadText.textContent = mode === 'mono' ? "Drag & Drop Unimanual CSV" : "Drag & Drop Bimanual CSV";
+            },
+
+            handleFile: (file) => {
+                if (!file.name.endsWith('.csv')) { alert('CSV file required'); return; }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    App.parseCSV(e.target.result);
+                    UI.setupSidebar();
+                    UI.els.uploadSection.style.display = 'none';
+                    UI.els.analysisSection.classList.add('active');
+                    
+                    App.initROI();
+                    
+                    UI.els.playbackSlider.max = AppState.csvData.length - 1;
+                    UI.updatePlaybackSlider(0, AppState.csvData.length - 1);
+                    
+                    setTimeout(() => { App.updateView(); window.dispatchEvent(new Event('resize')); }, 100);
+                };
+                reader.readAsText(file);
+            },
+
+            parseCSV: (text) => {
+                const lines = text.trim().split('\n').filter(line => line.trim());
+                const headers = lines[0].split(';');
+                AppState.allFrames = []; 
+                AppState.csvData = lines.slice(1).map(line => {
+                    const values = line.split(';');
+                    const row = {};
+                    headers.forEach((header, index) => { row[header.trim()] = values[index] ? values[index].replace(',', '.') : ''; });
+                    const fVal = row['Frame'] || row['﻿Frame'];
+                    AppState.allFrames.push(fVal ? parseFloat(fVal) : 0);
+                    return row;
+                });
+            },
+
+            initROI: () => {
+                AppState.cropStartIndex = 0;
+                AppState.cropEndIndex = AppState.csvData.length - 1;
+                
+                UI.els.cropStartSlider.max = AppState.csvData.length - 1;
+                UI.els.cropEndSlider.max = AppState.csvData.length - 1;
+                UI.els.cropStartSlider.value = 0;
+                UI.els.cropEndSlider.value = AppState.csvData.length - 1;
+                
+                UI.els.cropStartVal.textContent = AppState.allFrames[0];
+                UI.els.cropEndVal.textContent = AppState.allFrames[AppState.allFrames.length - 1];
+            },
+
+            updateCrop: (type) => {
+                let sIdx = parseInt(UI.els.cropStartSlider.value);
+                let eIdx = parseInt(UI.els.cropEndSlider.value);
+
+                if (type === 'start') {
+                    if (sIdx >= eIdx) { sIdx = eIdx - 1; UI.els.cropStartSlider.value = sIdx; }
+                } else {
+                    if (eIdx <= sIdx) { eIdx = sIdx + 1; UI.els.cropEndSlider.value = eIdx; }
+                }
+
+                AppState.cropStartIndex = sIdx;
+                AppState.cropEndIndex = eIdx;
+                
+                UI.els.cropStartVal.textContent = AppState.allFrames[sIdx];
+                UI.els.cropEndVal.textContent = AppState.allFrames[eIdx];
+
+                const pbVal = parseInt(UI.els.playbackSlider.value);
+                if (pbVal < sIdx) { Playback.manualSeek(sIdx); }
+                else if (pbVal > eIdx) { Playback.manualSeek(eIdx); }
+
+                const prefix = App.getPrefix(AppState.currentView);
+                const slice = AppState.csvData.slice(AppState.cropStartIndex, AppState.cropEndIndex + 1);
+                UI.renderMetrics(MetricsEngine.computeAll(slice, prefix));
+                if (AppState.currentPlane !== 'xy') Charts.updatePolar(prefix); // Update polar only if visible/affected
+                else Charts.updatePolar(prefix);
+            },
+
+            updateRefHand: () => {
+                const radios = document.getElementsByName('refHand');
+                for (const r of radios) { if (r.checked) AppState.referenceHand = r.value; }
+                const prefix = App.getPrefix(AppState.currentView);
+                const slice = AppState.csvData.slice(AppState.cropStartIndex, AppState.cropEndIndex + 1);
+                UI.renderMetrics(MetricsEngine.computeAll(slice, prefix));
+            },
+
+            getPrefix: (view) => {
+                if (view === 'head') return 'Head';
+                if (AppState.analysisMode === 'mono') {
+                    if (view === 'hand') return (AppState.csvData[0]['HandPosition_x'] !== undefined) ? 'Hand' : 'RHand';
+                } else {
+                    if (view === 'left') return 'LHand';
+                    if (view === 'right') return 'RHand';
+                }
+                return 'Head';
+            },
+
+            getTitle: (view) => {
+                return view==='head'?'Head':(AppState.analysisMode==='mono'?'Hand':(view==='left'?'Left Hand':'Right Hand'));
+            },
+
+            updateView: () => {
+                const prefix = App.getPrefix(AppState.currentView);
+                UI.updateTitles(App.getTitle(AppState.currentView));
+                
+                UI.renderTables(prefix);
+                
+                // Recalculate Metrics for current slice
+                const slice = AppState.csvData.slice(AppState.cropStartIndex, AppState.cropEndIndex + 1);
+                UI.renderMetrics(MetricsEngine.computeAll(slice, prefix));
+                
+                if (AppState.is3DViewActive) Charts.update3D(prefix);
+                else Charts.updateScatter(prefix);
+                
+                Charts.update2D(prefix);
+                Charts.updatePolar(prefix);
+            },
+
+            selectFrame: (index, autoScroll = false) => {
+                AppState.selectedFrameIndex = index;
+                const prefix = App.getPrefix(AppState.currentView);
+
+                // FIX FOR V15: Allow autoscroll even during playback
+                UI.highlightRow(index, autoScroll);
+                UI.updatePlaybackSlider(index, AppState.csvData.length - 1);
+
+                const row = AppState.csvData[index];
+                if(!row) return;
+
+                const px = parseFloat(row[`${prefix}Position_x`]);
+                const py = parseFloat(row[`${prefix}Position_y`]);
+                const pz = parseFloat(row[`${prefix}Position_z`]);
+                const frameReal = AppState.allFrames[index];
+
+                // Update Plotly without full redraw for performance
+                if(!AppState.is3DViewActive) {
+                    let x, y;
+                    switch(AppState.currentPlane) {
+                        case 'xy': x=px; y=py; break;
+                        case 'xz': x=px; y=pz; break;
+                        case 'yz': x=py; y=pz; break;
+                    }
+                    Plotly.restyle('scatterChart', {x: [[x]], y: [[y]]}, [1]);
+                } else {
+                    Plotly.restyle('view3DContainer', {x: [[px]], y: [[py]], z: [[pz]]}, [1]);
+                }
+
+                Plotly.relayout('position2DChart', {
+                    'shapes': [{
+                        type: 'line', x0: frameReal, x1: frameReal, y0: 0, y1: 1, xref: 'x', yref: 'paper',
+                        line: { color: 'white', width: 2, dash: 'dot' }
+                    }]
+                });
+            }
+        };
+
+        // Initialize App
+        App.init();
+
+    </script>
+</body>
+</html>
