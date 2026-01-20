@@ -17,12 +17,12 @@ The module includes:
 - **Controller-free interaction**: designed for users with limited grasp capacity (hand tracking).
 - **Mono- and bimanual analysis**: supports unimanual dexterity and bimanual coordination sessions.
 - **Automated metrics and interactive plots**, including:
-  - velocity profiles,
-  - smoothness (Number of Velocity Peaks, NVP),
-  - path efficiency (tortuosity),
-  - functional ROM volume,
-  - head–hand relationship measures (compensation proxy),
-  - left vs. right comparative reporting.
+  - Velocity profiles,
+  - Smoothness (Number of Velocity Peaks, NVP).
+  - Path efficiency (tortuosity).
+  - Functional ROM volume.
+  - Head–hand relationship measures (compensation proxy).
+  - Left vs. right comparative reporting.
 
 ## Repository structure
 
@@ -56,6 +56,23 @@ RehabImmersive-Kinematic-Analysis/
 - Handball: `Serious_Games_VR_apks/hbt_v_2_2.apk`
 
 You can install using MQDH or via `adb install <apk>`.
+### Execution APKs
+
+The application can be run directly from the headset, or it can be run via **Meta Quest Developer Hub** (or any other application that allows running `adb` commands).
+
+#### Custom User Execution
+To create or load a specific user and store their related data (configuration, history, and kinematics), it is necessary to launch the application using a custom ADB execution command:
+
+adb -d shell am start -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -S -f 0x10200000 -n com.RehabImmersive.[PackageName]/com.unity3d.player.UnityPlayerActivity -e user [userID] 
+
+Detailed Parameters:
+
+- Package Name (com.RehabImmersive.[PackageName]): This is the package name assigned in Unity, which also defines the working directory.
+        * For vBBT.apk: Use com.RehabImmersive.boxAndBlock
+        * For HGTraining: Use com.RehabImmersive.HGTrainer
+- User Identifier (-e user [userID]): This flag passes the specific ID of the user you want to create or load.
+
+- Default Behavior: If no identifier is specified, a default user will be automatically created or loaded.
 
 ### Retrieve the generated CSV logs
 After playing, the applications store the kinematic logs locally on the headset.  
