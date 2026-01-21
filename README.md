@@ -123,7 +123,7 @@ This project is released under the **MIT License**. See `LICENSE`.
 
 - **Javier Albusac** (corresponding author): javieralonso.albusac@uclm.es  
 - **Vanesa Herrera**  
-- **David Vallejo** 
+- **Sergio Martínez Cid** 
 - **Ana de los Reyes Guzmán**
 - **Carlos González Morcillo**
 
