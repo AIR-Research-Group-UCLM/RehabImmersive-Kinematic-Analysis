@@ -116,7 +116,7 @@ This project is released under the **MIT License**. See `LICENSE`.
 - **Vanesa Herrera**  
 - **Sergio Martínez Cid** 
 - **Ana de los Reyes Guzmán**
-- **Carlos González Morcillo**
+- **Rubén Grande Muñoz**
 
 ## Acknowledgments
 
