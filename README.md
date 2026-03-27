@@ -105,15 +105,6 @@ This reproduces the full analysis workflow (metrics and plots) without installin
 
 ---
 
-## Citation
-
-If you use this repository in academic work, please cite:
-1. The SoftwareX paper describing this kinematic module/pipeline (to be added once published).
-2. The Rehab-Immersive framework paper:
-
-**Reference (framework paper):**  
-Herrera, V., Vallejo, D., Castro-Schez, J. J., Monekosso, D. N., de los Reyes, A., Glez-Morcillo, C., and Albusac, J. (2023). *Rehab-Immersive: A framework to support the development of virtual reality applications in upper limb rehabilitation*. **SoftwareX**, 23, 101412. https://doi.org/10.1016/j.softx.2023.101412
-
 
 ## License
 
