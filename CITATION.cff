@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "RehabImmersive-Kinematic-Analysis: a browser-based kinematic analysis tool for upper-limb rehabilitation in immersive virtual reality"
+abstract: "Software ecosystem for upper-limb neurorehabilitation combining virtual reality serious games for Meta Quest with a privacy-preserving, browser-based tool for post hoc kinematic analysis. The tool computes clinical metrics (range of motion, movement smoothness and path efficiency) from head and hand motion logs, without external motion-capture infrastructure."
+authors:
+  - family-names: "Albusac"
+    given-names: "Javier"
+    affiliation: "Universidad de Castilla-La Mancha, Ciudad Real, Spain"
+    orcid: "https://orcid.org/0000-0003-1889-3065"
+  - family-names: "Herrera"
+    given-names: "Vanesa"
+    affiliation: "Universidad de Castilla-La Mancha, Ciudad Real, Spain"
+    orcid: "https://orcid.org/0000-0002-6187-4794"
+  - family-names: "Grande"
+    given-names: "Rubén"
+    affiliation: "Universidad de Castilla-La Mancha, Ciudad Real, Spain"
+    orcid: "https://orcid.org/0000-0002-0583-6865"
+  - family-names: "Martinez-Cid"
+    given-names: "Sergio"
+    affiliation: "Universidad de Castilla-La Mancha, Ciudad Real, Spain"
+    orcid: "https://orcid.org/0009-0009-8976-4974"
+  - family-names: "de los Reyes-Guzmán"
+    given-names: "Ana"
+    affiliation: "Hospital Nacional de Parapléjicos, Toledo, Spain"
+    orcid: "https://orcid.org/0000-0003-2905-2405"
+license: MIT
+repository-code: "https://github.com/AIR-Research-Group-UCLM/RehabImmersive-Kinematic-Analysis"
+keywords:
+  - "upper-limb rehabilitation"
+  - "kinematic analysis"
+  - "immersive virtual reality"
+  - "Meta Quest"
+  - "serious games"
+  - "neurorehabilitation"
+preferred-citation:
+  type: article
+  doi: "10.1016/j.simpa.2026.100853"
