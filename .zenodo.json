@@ -1,0 +1,50 @@
+{
+  "title": "RehabImmersive-Kinematic-Analysis: a browser-based kinematic analysis tool for upper-limb rehabilitation in immersive virtual reality",
+  "description": "Software ecosystem for upper-limb neurorehabilitation combining virtual reality serious games for Meta Quest with a privacy-preserving, browser-based tool for post hoc kinematic analysis. The tool computes clinical metrics (range of motion, movement smoothness and path efficiency) from head and hand motion logs, without external motion-capture infrastructure. This work was supported by the Spanish Ministry of Science, Innovation and Universities / Agencia Estatal de Investigación under grant PID2020-117361RB-C21 (project REHAB-IMMERSIVE), and carried out by the AIR Research Group of the Universidad de Castilla-La Mancha in collaboration with the Hospital Nacional de Parapléjicos (Toledo, Spain).",
+  "creators": [
+    {
+      "name": "Albusac, Javier",
+      "affiliation": "Universidad de Castilla-La Mancha, Ciudad Real, Spain",
+      "orcid": "0000-0003-1889-3065"
+    },
+    {
+      "name": "Herrera, Vanesa",
+      "affiliation": "Universidad de Castilla-La Mancha, Ciudad Real, Spain",
+      "orcid": "0000-0002-6187-4794"
+    },
+    {
+      "name": "Grande, Rubén",
+      "affiliation": "Universidad de Castilla-La Mancha, Ciudad Real, Spain",
+      "orcid": "0000-0002-0583-6865"
+    },
+    {
+      "name": "Martinez-Cid, Sergio",
+      "affiliation": "Universidad de Castilla-La Mancha, Ciudad Real, Spain",
+      "orcid": "0009-0009-8976-4974"
+    },
+    {
+      "name": "de los Reyes-Guzmán, Ana",
+      "affiliation": "Hospital Nacional de Parapléjicos, Toledo, Spain",
+      "orcid": "0000-0003-2905-2405"
+    }
+  ],
+  "upload_type": "software",
+  "license": "mit",
+  "keywords": [
+    "upper-limb rehabilitation",
+    "kinematic analysis",
+    "immersive virtual reality",
+    "Meta Quest",
+    "serious games",
+    "neurorehabilitation"
+  ],
+  "access_right": "open",
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "10.1016/j.simpa.2026.100853",
+      "relation": "isSupplementTo",
+      "scheme": "doi"
+    }
+  ]
+}
